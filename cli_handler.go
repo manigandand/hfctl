@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"errors"
 	"hfctl/types"
 	"hfctl/utils"
 	"log"
@@ -13,9 +12,10 @@ import (
 // defaultStatsCalHandler command handler calculates the recipe stats from the given fixtures
 // for the default parameters
 // Assumption: we expect the user always provide filepath or urlpath to the fixtures
+// else, load default test fixtures from the fs
 //
-// TODO: load default fixtures from the fs, the given default test fixtures
-// is more than 100MB, so rethink to adding that into the docker image
+// TODO: the given default test fixtures is more than 100MB,
+// so rethink to adding that into the docker image
 func defaultStatsCalHandler(c *cli.Context) error {
 	data, err := readRecipeData(c.String("file"))
 	if err != nil {
@@ -66,7 +66,8 @@ func printStats(recipeStats *types.RecipeStats) error {
 func readRecipeData(f string) ([]*types.Recipe, error) {
 	var data []*types.Recipe
 	if ts(f) == "" {
-		return nil, errors.New("please specify file path")
+		// load default test data, if the filepath not given
+		f = "test/hf_test_calculation_fixtures.json"
 	}
 	body, err := utils.GetBytesForFileOrURL(ts(f))
 	if err != nil {

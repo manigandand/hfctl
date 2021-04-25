@@ -9,24 +9,6 @@ import (
 
 var _ = Describe("CLI handler test suite", func() {
 	Context("Read Recipe Data From File", func() {
-		When("empty file provided", func() {
-			var (
-				data []*types.Recipe
-				err  error
-			)
-			BeforeEach(func() {
-				data, err = readRecipeData("")
-
-			})
-			JustBeforeEach(func() {
-				// perr = printStats(data, defaultPostcode, defaultTimeWindow, defaultRecipeToSearch)
-			})
-			It("should return please specify file path", func() {
-				Expect(err.Error()).Should(Equal("please specify file path"))
-				Expect(data).Should(BeNil())
-			})
-		})
-
 		When("invalid file provided", func() {
 			var (
 				data []*types.Recipe
@@ -82,6 +64,23 @@ var _ = Describe("CLI handler test suite", func() {
 		})
 
 		When("valid file", func() {
+			var (
+				data      []*types.Recipe
+				err, perr error
+			)
+			BeforeEach(func() {
+				data, err = readRecipeData("./test/hf_test_calculation_fixtures.json")
+				Expect(err).ShouldNot(HaveOccurred())
+			})
+			JustBeforeEach(func() {
+				perr = printStats(NewDefaultStatsInput(data).Calculate())
+			})
+			It("should stdout the stats", func() {
+				Expect(perr).ShouldNot(HaveOccurred())
+			})
+		})
+
+		When("empty file provided", func() {
 			var (
 				data      []*types.Recipe
 				err, perr error
