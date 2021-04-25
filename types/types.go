@@ -2,11 +2,18 @@ package types
 
 import "sort"
 
+const (
+	MaxDistinctRecipes = 2000
+)
+
 // RecipeCountMap: custom map type which holdes the counts(occurences) of the recipes
 type RecipeCountMap map[string]int
 
 // increment the delivery counts by 1 for the given postal codes
 func (rcMap RecipeCountMap) Inc(recipe string) {
+	if len(recipe) > 100 || len(rcMap) == MaxDistinctRecipes {
+		return
+	}
 	count, ok := rcMap[recipe]
 	if !ok {
 		rcMap[recipe] = 1
@@ -42,6 +49,9 @@ type PostcodeDeliveryCountMap map[string]int
 
 // increment the delivery counts by 1 for the given postal codes
 func (pdcMap PostcodeDeliveryCountMap) Inc(postcode string) {
+	if len(postcode) > 10 {
+		return
+	}
 	dCount, ok := pdcMap[postcode]
 	if !ok {
 		pdcMap[postcode] = 1

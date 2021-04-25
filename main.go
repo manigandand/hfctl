@@ -8,6 +8,8 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+// FIXME: known issue: memory & run time spikes up when loading large data sets
+
 var (
 	olog *log.Logger
 )
