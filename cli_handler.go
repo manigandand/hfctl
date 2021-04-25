@@ -29,7 +29,27 @@ func defaultStatsCalHandler(c *cli.Context) error {
 // recipeSearchStats command handler calculates the recipe stats from the given fixtures
 // for the given search parameters like recipe_names, postcode & time_window
 func recipeSearchStats(c *cli.Context) error {
-	return nil
+	postcode := c.String("postcode")
+	if ts(postcode) == "" {
+		postcode = defaultPostcode
+	}
+	timeWindow := c.String("time-window")
+	if ts(timeWindow) == "" {
+		timeWindow = defaultTimeWindow
+	}
+	recipes := c.String("recipes")
+	if ts(recipes) == "" {
+		recipes = defaultRecipeToSearch
+	}
+
+	data, err := readRecipeData(c.String("file"))
+	if err != nil {
+		log.Fatal(err.Error())
+		return nil
+	}
+	stats := NewStats(data, postcode, timeWindow, recipes).Calculate()
+
+	return printStats(stats)
 }
 
 func printStats(recipeStats *types.RecipeStats) error {

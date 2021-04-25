@@ -21,7 +21,6 @@ type recipeStatsInput struct {
 	data       []*types.Recipe
 	postcode   string
 	timeWindow string
-	recipeStr  string
 	recipes    []string
 }
 
@@ -32,7 +31,6 @@ func NewDefaultStatsInput(data []*types.Recipe) *recipeStatsInput {
 		data:       data,
 		postcode:   defaultPostcode,
 		timeWindow: defaultTimeWindow,
-		recipeStr:  defaultRecipeToSearch,
 		recipes:    strings.Split(defaultRecipeToSearch, ","),
 	}
 }
@@ -43,7 +41,6 @@ func NewStats(data []*types.Recipe, postcode, timeWindow, recipes string) *recip
 		data:       data,
 		postcode:   postcode,
 		timeWindow: timeWindow,
-		recipeStr:  recipes,
 		recipes:    strings.Split(recipes, ","),
 	}
 }
