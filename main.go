@@ -8,6 +8,17 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+var (
+	olog *log.Logger
+)
+
+func init() {
+	log.SetOutput(os.Stdout)
+	olog = log.New(os.Stdout, "", log.LstdFlags)
+	// don't want to print the date time prefix
+	olog.SetFlags(0)
+}
+
 // init cli app configurations
 func main() {
 	app := cli.NewApp()
@@ -74,7 +85,7 @@ hfctl gives you a meaningful stats of recipes and let you search by postalcode a
 	`
 	app.EnableBashCompletion = true
 	app.Version = "v1.0.0"
-	app.Action = recipeStats
+	app.Action = defaultStatsCalHandler
 	sort.Sort(cli.CommandsByName(app.Commands))
 	if err := app.Run(os.Args); err != nil {
 		log.Fatal(err)
@@ -90,8 +101,8 @@ Examples:
   hfctl -f ./test/hf_test_calculation_fixtures.json search -r="Mango,Chicken"
 
   # Get the no.of deliveries count by POSTAL CODE and TIME WINDOW.
-  hfctl -f ./test/hf_test_calculation_fixtures.json search --postcode="10120" --time-window="10AM-2PM"
-  hfctl -f ./test/hf_test_calculation_fixtures.json search -pc="10120" -tw="10AM-2PM"
+  hfctl -f ./test/hf_test_calculation_fixtures.json search --postcode="10120" --time-window="10AM - 2PM"
+  hfctl -f ./test/hf_test_calculation_fixtures.json search -pc="10120" -tw="10AM - 2PM"
 
 Options:
     -r, --recipes='': Search all the recipes which has these RECIPE KEY names.
