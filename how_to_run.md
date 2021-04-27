@@ -37,6 +37,12 @@ CLI app - HelloFresh Recipe Stats Calculator
 - 4th arg - **recipes to search**
 
 ```
+./hfctl --file test/hf_test_calculation_fixtures.json search --postcode="10121" --time-window="10AM-2PM" --recipes="Mango,Chicken" | jq .
+```
+
+> or
+
+```
 ./deployment.sh
 <!-- or -->
 ./deployment.sh $PWD/test/hf_test_calculation_fixtures.json
