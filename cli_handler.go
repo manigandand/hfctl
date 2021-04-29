@@ -3,8 +3,8 @@ package main
 import (
 	"encoding/json"
 	"hfctl/types"
-	"hfctl/utils"
 	"log"
+	"os"
 
 	"github.com/urfave/cli/v2"
 )
@@ -17,13 +17,14 @@ import (
 // TODO: the given default test fixtures is more than 100MB,
 // so rethink to adding that into the docker image
 func defaultStatsCalHandler(c *cli.Context) error {
-	data, err := readRecipeData(c.String("file"))
+	fileReader, jsonDecoder, err := readRecipeData(c.String("file"))
+	defer func() { fileReader.Close() }()
 	if err != nil {
 		log.Println(err.Error())
 		return nil
 	}
 
-	return printStats(NewDefaultStatsInput(data).Calculate())
+	return printStats(NewDefaultStatsInput(jsonDecoder).Calculate())
 }
 
 // recipeSearchStats command handler calculates the recipe stats from the given fixtures
@@ -42,12 +43,13 @@ func recipeSearchStats(c *cli.Context) error {
 		recipes = defaultRecipeToSearch
 	}
 
-	data, err := readRecipeData(c.String("file"))
+	fileReader, jsonDecoder, err := readRecipeData(c.String("file"))
+	defer func() { fileReader.Close() }()
 	if err != nil {
 		log.Fatal(err.Error())
 		return nil
 	}
-	stats := NewStats(data, postcode, timeWindow, recipes).Calculate()
+	stats := NewStats(jsonDecoder, postcode, timeWindow, recipes).Calculate()
 
 	return printStats(stats)
 }
@@ -63,19 +65,14 @@ func printStats(recipeStats *types.RecipeStats) error {
 }
 
 // readRecipeData decodes the recipe fixtures data from the given filePath or URL
-func readRecipeData(f string) ([]*types.Recipe, error) {
-	var data []*types.Recipe
+func readRecipeData(f string) (*os.File, *json.Decoder, error) {
 	if ts(f) == "" {
 		// load default test data, if the filepath not given
 		f = "test/hf_test_calculation_fixtures.json"
 	}
-	body, err := utils.GetBytesForFileOrURL(ts(f))
+	fileReader, err := os.Open(ts(f))
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	if err := json.Unmarshal(body, &data); err != nil {
-		return nil, err
-	}
-
-	return data, nil
+	return fileReader, json.NewDecoder(fileReader), nil
 }

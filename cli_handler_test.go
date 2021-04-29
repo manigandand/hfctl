@@ -1,7 +1,8 @@
 package main
 
 import (
-	"hfctl/types"
+	"encoding/json"
+	"os"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -11,12 +12,16 @@ var _ = Describe("CLI handler test suite", func() {
 	Context("Read Recipe Data From File", func() {
 		When("invalid file provided", func() {
 			var (
-				data []*types.Recipe
+				data *json.Decoder
+				f    *os.File
 				err  error
 			)
 			BeforeEach(func() {
-				data, err = readRecipeData("./test/invalid.json")
+				f, data, err = readRecipeData("./test/invalid.json")
 
+			})
+			AfterEach(func() {
+				f.Close()
 			})
 			JustBeforeEach(func() {
 				// perr = printStats(data, defaultPostcode, defaultTimeWindow, defaultRecipeToSearch)
@@ -29,12 +34,16 @@ var _ = Describe("CLI handler test suite", func() {
 
 		When("invalid file provided", func() {
 			var (
-				data []*types.Recipe
+				f    *os.File
+				data *json.Decoder
 				err  error
 			)
 			BeforeEach(func() {
-				data, err = readRecipeData("./test/invalid.json")
+				f, data, err = readRecipeData("./test/invalid.json")
 
+			})
+			AfterEach(func() {
+				f.Close()
 			})
 			JustBeforeEach(func() {
 				// perr = printStats(data, defaultPostcode, defaultTimeWindow, defaultRecipeToSearch)
@@ -47,11 +56,15 @@ var _ = Describe("CLI handler test suite", func() {
 
 		When("invalid file content to read", func() {
 			var (
-				data      []*types.Recipe
+				f         *os.File
+				data      *json.Decoder
 				err, perr error
 			)
 			BeforeEach(func() {
-				data, err = readRecipeData("./test/invalid_data.json")
+				f, data, err = readRecipeData("./test/invalid_data.json")
+			})
+			AfterEach(func() {
+				f.Close()
 			})
 			JustBeforeEach(func() {
 				perr = printStats(NewDefaultStatsInput(data).Calculate())
@@ -65,12 +78,16 @@ var _ = Describe("CLI handler test suite", func() {
 
 		When("valid file", func() {
 			var (
-				data      []*types.Recipe
+				f         *os.File
+				data      *json.Decoder
 				err, perr error
 			)
 			BeforeEach(func() {
-				data, err = readRecipeData("./test/hf_test_calculation_fixtures.json")
+				f, data, err = readRecipeData("./test/hf_test_calculation_fixtures.json")
 				Expect(err).ShouldNot(HaveOccurred())
+			})
+			AfterEach(func() {
+				f.Close()
 			})
 			JustBeforeEach(func() {
 				perr = printStats(NewDefaultStatsInput(data).Calculate())
@@ -82,12 +99,16 @@ var _ = Describe("CLI handler test suite", func() {
 
 		When("empty file provided", func() {
 			var (
-				data      []*types.Recipe
+				f         *os.File
+				data      *json.Decoder
 				err, perr error
 			)
 			BeforeEach(func() {
-				data, err = readRecipeData("./test/hf_test_calculation_fixtures.json")
+				f, data, err = readRecipeData("./test/hf_test_calculation_fixtures.json")
 				Expect(err).ShouldNot(HaveOccurred())
+			})
+			AfterEach(func() {
+				f.Close()
 			})
 			JustBeforeEach(func() {
 				perr = printStats(NewDefaultStatsInput(data).Calculate())

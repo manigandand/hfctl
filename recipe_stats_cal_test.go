@@ -1,7 +1,9 @@
 package main
 
 import (
+	"encoding/json"
 	"hfctl/types"
+	"os"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -33,16 +35,20 @@ var _ = Describe("Book", func() {
 
 		When("valid file", func() {
 			var (
-				data []*types.Recipe
+				data *json.Decoder
+				f    *os.File
 				err  error
 				res  *types.RecipeStats
 			)
 			BeforeEach(func() {
-				data, err = readRecipeData("./test/hf_test_calculation_fixtures.json")
+				f, data, err = readRecipeData("./test/hf_test_calculation_fixtures.json")
 				Expect(err).ShouldNot(HaveOccurred())
 			})
 			JustBeforeEach(func() {
 				res = NewDefaultStatsInput(data).Calculate()
+			})
+			AfterEach(func() {
+				f.Close()
 			})
 			It("should stdout the stats", func() {
 				Expect(res.UniqueRecipeCount).Should(Equal(29))

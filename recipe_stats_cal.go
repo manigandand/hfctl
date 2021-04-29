@@ -1,8 +1,10 @@
 package main
 
 import (
+	"encoding/json"
 	"hfctl/types"
 	"hfctl/utils"
+	"io"
 	"regexp"
 	"sort"
 	"strings"
@@ -18,7 +20,7 @@ const (
 
 // recipe stats calculator inputs
 type recipeStatsInput struct {
-	data       []*types.Recipe
+	data       *json.Decoder
 	postcode   string
 	timeWindow string
 	recipes    []string
@@ -26,9 +28,9 @@ type recipeStatsInput struct {
 
 // NewDefaultStatsInput returns the recipe stats calculator inputs object with
 // the default inputs
-func NewDefaultStatsInput(data []*types.Recipe) *recipeStatsInput {
+func NewDefaultStatsInput(jsonDecoder *json.Decoder) *recipeStatsInput {
 	return &recipeStatsInput{
-		data:       data,
+		data:       jsonDecoder,
 		postcode:   defaultPostcode,
 		timeWindow: defaultTimeWindow,
 		recipes:    strings.Split(defaultRecipeToSearch, ","),
@@ -36,9 +38,9 @@ func NewDefaultStatsInput(data []*types.Recipe) *recipeStatsInput {
 }
 
 // NewStats returns the recipe stats calculator inputs object with the given inputs
-func NewStats(data []*types.Recipe, postcode, timeWindow, recipes string) *recipeStatsInput {
+func NewStats(jsonDecoder *json.Decoder, postcode, timeWindow, recipes string) *recipeStatsInput {
 	return &recipeStatsInput{
-		data:       data,
+		data:       jsonDecoder,
 		postcode:   postcode,
 		timeWindow: timeWindow,
 		recipes:    strings.Split(recipes, ","),
@@ -65,7 +67,15 @@ func (i *recipeStatsInput) Calculate() *types.RecipeStats {
 
 	inputTime := parseInputTime(i.timeWindow)
 
-	for _, d := range i.data {
+	for {
+		// decode data from the json decoder
+		var d *types.Recipe
+		if err := i.data.Decode(&d); err == io.EOF {
+			break
+		}
+		if d == nil {
+			continue
+		}
 		d.Recipe = ts(d.Recipe)
 		// unique recipe count
 		uniqueRecipeCount.Inc(d.Recipe)
