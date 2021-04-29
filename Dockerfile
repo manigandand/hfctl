@@ -11,7 +11,7 @@ WORKDIR /app
 # This require the project to be built first before copying,
 # else docker build will fail
 COPY hfctl /app/
-COPY test/hf_test_calculation_fixtures.json /app/test/
+COPY test/json_file.log /app/test/
 
 VOLUME /app
 

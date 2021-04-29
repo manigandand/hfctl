@@ -68,7 +68,7 @@ func printStats(recipeStats *types.RecipeStats) error {
 func readRecipeData(f string) (*os.File, *json.Decoder, error) {
 	if ts(f) == "" {
 		// load default test data, if the filepath not given
-		f = "test/hf_test_calculation_fixtures.json"
+		f = "test/json_file.log"
 	}
 	fileReader, err := os.Open(ts(f))
 	if err != nil {
