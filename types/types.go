@@ -6,26 +6,26 @@ const (
 	MaxDistinctRecipes = 2000
 )
 
-// RecipeCountMap: custom map type which holdes the counts(occurences) of the recipes
-type RecipeCountMap map[string]int
+// RecipeCount: custom map type which holdes the counts(occurences) of the recipes
+type RecipeCount map[string]int
 
 // increment the delivery counts by 1 for the given postal codes
-func (rcMap RecipeCountMap) Inc(recipe string) {
-	if len(recipe) > 100 || len(rcMap) == MaxDistinctRecipes {
+func (rc RecipeCount) Inc(recipe string) {
+	if len(recipe) > 100 || len(rc) == MaxDistinctRecipes {
 		return
 	}
-	count, ok := rcMap[recipe]
+	count, ok := rc[recipe]
 	if !ok {
-		rcMap[recipe] = 1
+		rc[recipe] = 1
 		return
 	}
-	rcMap[recipe] = count + 1
+	rc[recipe] = count + 1
 }
 
 // converts the map to `CountPerRecipe`
-func (rcMap RecipeCountMap) ToStruct() []CountPerRecipe {
-	uniqueRecipe := make([]CountPerRecipe, 0, len(rcMap))
-	for r, c := range rcMap {
+func (rc RecipeCount) ToStruct() []CountPerRecipe {
+	uniqueRecipe := make([]CountPerRecipe, 0, len(rc))
+	for r, c := range rc {
 		uniqueRecipe = append(uniqueRecipe, CountPerRecipe{
 			Recipe: r,
 			Count:  c,
@@ -43,27 +43,27 @@ func (a SortByRecipeName) Len() int           { return len(a) }
 func (a SortByRecipeName) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a SortByRecipeName) Less(i, j int) bool { return a[i].Recipe < a[j].Recipe }
 
-// PostcodeDeliveryCountMap: custom map type which holdes the delivery counts
+// PostcodeDeliveryCount: custom map type which holdes the delivery counts
 // of the postal codes
-type PostcodeDeliveryCountMap map[string]int
+type PostcodeDeliveryCount map[string]int
 
 // increment the delivery counts by 1 for the given postal codes
-func (pdcMap PostcodeDeliveryCountMap) Inc(postcode string) {
+func (pdc PostcodeDeliveryCount) Inc(postcode string) {
 	if len(postcode) > 10 {
 		return
 	}
-	dCount, ok := pdcMap[postcode]
+	dCount, ok := pdc[postcode]
 	if !ok {
-		pdcMap[postcode] = 1
+		pdc[postcode] = 1
 		return
 	}
-	pdcMap[postcode] = dCount + 1
+	pdc[postcode] = dCount + 1
 }
 
 // converts the map to `BusiestPostcode`
-func (pdcMap PostcodeDeliveryCountMap) GetBusiestPostcode() BusiestPostcode {
-	busiestPostcodes := make([]BusiestPostcode, 0, len(pdcMap))
-	for p, c := range pdcMap {
+func (pdc PostcodeDeliveryCount) GetBusiestPostcode() BusiestPostcode {
+	busiestPostcodes := make([]BusiestPostcode, 0, len(pdc))
+	for p, c := range pdc {
 		busiestPostcodes = append(busiestPostcodes, BusiestPostcode{
 			Postcode:      p,
 			DeliveryCount: c,

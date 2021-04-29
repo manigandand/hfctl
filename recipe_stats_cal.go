@@ -59,19 +59,19 @@ func (i *recipeStatsInput) Calculate() *types.RecipeStats {
 		postcodeDeliveryCount int
 	)
 	matchedRecipes := make([]string, 0)
-	uniqueRecipeCountMap := make(types.RecipeCountMap)
-	deliveryCountByPostcodeMap := make(types.PostcodeDeliveryCountMap)
-	matchedRecipesMap := make(map[string]bool)
+	uniqueRecipeCount := make(types.RecipeCount)
+	deliveryCountByPostcode := make(types.PostcodeDeliveryCount)
+	matchedRecipe := make(map[string]bool)
 
 	inputTime := parseInputTime(i.timeWindow)
 
 	for _, d := range i.data {
 		d.Recipe = ts(d.Recipe)
 		// unique recipe count
-		uniqueRecipeCountMap.Inc(d.Recipe)
+		uniqueRecipeCount.Inc(d.Recipe)
 
 		// delivery count by postalcode
-		deliveryCountByPostcodeMap.Inc(d.Postcode)
+		deliveryCountByPostcode.Inc(d.Postcode)
 
 		// delivery count for postalcode
 		dt := parseDeliveryTime(d.Delivery)
@@ -84,21 +84,21 @@ func (i *recipeStatsInput) Calculate() *types.RecipeStats {
 		// match recipe with any one of the given recipe inputs
 		for _, r := range i.recipes {
 			if matched, _ := regexp.MatchString(ts(r), d.Recipe); matched {
-				matchedRecipesMap[d.Recipe] = true
+				matchedRecipe[d.Recipe] = true
 				break
 			}
 		}
 	}
-	for r := range matchedRecipesMap {
+	for r := range matchedRecipe {
 		matchedRecipes = append(matchedRecipes, r)
 	}
 	sort.Strings(matchedRecipes)
 
 	// final recipe stats cal
 	stats := &types.RecipeStats{
-		UniqueRecipeCount: len(uniqueRecipeCountMap),
-		CountPerRecipe:    uniqueRecipeCountMap.ToStruct(),
-		BusiestPostcode:   deliveryCountByPostcodeMap.GetBusiestPostcode(),
+		UniqueRecipeCount: len(uniqueRecipeCount),
+		CountPerRecipe:    uniqueRecipeCount.ToStruct(),
+		BusiestPostcode:   deliveryCountByPostcode.GetBusiestPostcode(),
 		DeliveryStats: types.DeliveryStatsByPostcode{
 			Postcode:      i.postcode,
 			From:          inputTime.FromStr,

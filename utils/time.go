@@ -1,6 +1,6 @@
 package utils
 
-var railwayTimeMap = map[string]int{
+var railwayTime = map[string]int{
 	// AM
 	"12AM": 0,
 	"1AM":  1,
@@ -30,5 +30,5 @@ var railwayTimeMap = map[string]int{
 }
 
 func TimeStrToRailwayTime(ts string) int {
-	return railwayTimeMap[ts]
+	return railwayTime[ts]
 }
