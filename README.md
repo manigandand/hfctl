@@ -1,5 +1,3 @@
-# hfctl
-
 # Recipe Stats Calculator
 
 In the given assignment we suggest you to process an automatically generated JSON file with recipe data and calculated some stats.
